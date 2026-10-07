@@ -15,10 +15,12 @@ function sendAmcp(command) {
     const socket = new net.Socket();
     let response = '';
     let settled = false;
+    let responseTimer;
 
     const finish = (err) => {
       if (settled) return;
       settled = true;
+      clearTimeout(responseTimer);
       socket.destroy();
       if (err) reject(err);
       else resolve(response.trim());
@@ -26,7 +28,10 @@ function sendAmcp(command) {
 
     socket.setTimeout(2500);
     socket.connect(CASPAR_PORT, CASPAR_HOST, () => {
+      console.log('[CasparCG] connecté');
       socket.write(`${command}\r\n`);
+      // Some valid AMCP commands/versions may not send a response immediately.
+      responseTimer = setTimeout(() => finish(), 500);
     });
 
     socket.on('data', (data) => {
@@ -37,20 +42,40 @@ function sendAmcp(command) {
     });
 
     socket.on('timeout', () => finish(new Error('CasparCG ne répond pas. Vérifie qu’il est lancé.')));
-    socket.on('error', (err) => finish(err));
+    socket.on('error', (err) => {
+      console.error('[CasparCG] erreur:', err.message);
+      finish(err);
+    });
     socket.on('close', () => {
       if (!settled) finish();
     });
   });
 }
 
+function checkCasparPort() {
+  return new Promise((resolve) => {
+    const socket = new net.Socket();
+    let done = false;
+
+    const finish = (ok, error = null) => {
+      if (done) return;
+      done = true;
+      socket.destroy();
+      resolve({ ok, error });
+    };
+
+    socket.setTimeout(1000);
+    socket.once('connect', () => finish(true));
+    socket.once('timeout', () => finish(false, 'Délai de connexion dépassé'));
+    socket.once('error', (err) => finish(false, err.message));
+    socket.connect(CASPAR_PORT, CASPAR_HOST);
+  });
+}
+
 app.get('/api/status', async (_req, res) => {
-  try {
-    const response = await sendAmcp('PING');
-    res.json({ ok: true, response: response || 'Connexion établie' });
-  } catch (error) {
-    res.status(503).json({ ok: false, error: error.message });
-  }
+  const status = await checkCasparPort();
+  if (status.ok) return res.json({ ok: true, response: 'Port AMCP accessible' });
+  res.status(503).json({ ok: false, error: status.error || 'CasparCG hors ligne' });
 });
 
 app.post('/api/command', async (req, res) => {
@@ -64,7 +89,7 @@ app.post('/api/command', async (req, res) => {
 
   try {
     const response = await sendAmcp(command);
-    res.json({ ok: true, response });
+    res.json({ ok: true, response: response || 'Commande envoyée' });
   } catch (error) {
     res.status(503).json({ ok: false, error: error.message });
   }
@@ -73,4 +98,5 @@ app.post('/api/command', async (req, res) => {
 app.listen(PORT, () => {
   console.log(`JD TV Playout: http://localhost:${PORT}`);
   console.log(`CasparCG: ${CASPAR_HOST}:${CASPAR_PORT}`);
+  console.log('Détection CasparCG: test TCP direct activé');
 });
