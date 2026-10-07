@@ -1,100 +1,17 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>JD TV Playout</title>
-  <style>
-    :root { font-family: Inter, system-ui, sans-serif; color-scheme: dark; }
-    body { margin:0; background:#0b1020; color:#eef2ff; }
-    main { max-width:1100px; margin:0 auto; padding:32px 20px 60px; }
-    h1 { margin:0 0 6px; font-size:32px; }
-    .muted { color:#9aa4bf; }
-    .grid { display:grid; grid-template-columns:1.1fr .9fr; gap:18px; margin-top:24px; }
-    .card { background:#111831; border:1px solid #273152; border-radius:16px; padding:18px; }
-    .status { display:inline-flex; gap:8px; align-items:center; padding:8px 12px; border-radius:999px; background:#1a2344; }
-    .dot { width:10px; height:10px; border-radius:50%; background:#f59e0b; }
-    .ok .dot { background:#22c55e; }
-    .bad .dot { background:#ef4444; }
-    button { border:0; border-radius:10px; padding:10px 14px; font-weight:700; cursor:pointer; }
-    button.primary { background:#4f46e5; color:white; }
-    button.secondary { background:#202a4d; color:#eef2ff; }
-    button.danger { background:#7f1d1d; color:white; }
-    .buttons { display:flex; flex-wrap:wrap; gap:10px; margin-top:14px; }
-    input { width:100%; box-sizing:border-box; margin-top:8px; padding:11px 12px; background:#0b1020; color:white; border:1px solid #344064; border-radius:10px; }
-    .program { display:grid; grid-template-columns:100px 1fr auto; gap:12px; align-items:center; padding:12px 0; border-bottom:1px solid #222d4f; }
-    .program:last-child { border-bottom:none; }
-    .onair { color:#f87171; font-weight:800; }
-    pre { white-space:pre-wrap; word-break:break-word; background:#090d1b; padding:12px; border-radius:10px; min-height:70px; }
-    @media(max-width:800px){ .grid { grid-template-columns:1fr; } }
-  </style>
-</head>
-<body>
-<main>
-  <h1>JD TV Playout</h1>
-  <div class="muted">MVP local — pilotage CasparCG</div>
-
-  <div style="margin-top:18px">
-    <span id="status" class="status"><span class="dot"></span><span>Vérification CasparCG…</span></span>
-  </div>
-
-  <div class="grid">
-    <section class="card">
-      <h2>Contrôle antenne</h2>
-      <div class="buttons">
-        <button class="primary" onclick="cmd('PLAY 1-1 PROGRAMME1')">▶ PROGRAMME1</button>
-        <button class="primary" onclick="cmd('PLAY 1-1 PROGRAMME2')">▶ PROGRAMME2</button>
-        <button class="secondary" onclick="cmd('PLAY 1-1 JINGLE')">▶ JINGLE</button>
-        <button class="danger" onclick="cmd('STOP 1-1')">■ STOP</button>
-        <button class="secondary" onclick="cmd('CLEAR 1')">CLEAR</button>
-      </div>
-
-      <h3 style="margin-top:24px">Commande personnalisée</h3>
-      <input id="command" value="LOADBG 1-1 JINGLE AUTO" />
-      <div class="buttons">
-        <button class="secondary" onclick="sendCustom()">Envoyer</button>
-      </div>
-
-      <h3 style="margin-top:24px">Réponse CasparCG</h3>
-      <pre id="log">Prêt.</pre>
-    </section>
-
-    <section class="card">
-      <h2>Mini-grille de test</h2>
-      <div class="program"><strong>18:00</strong><span>PROGRAMME1</span><span class="onair">TEST</span></div>
-      <div class="program"><strong>19:00</strong><span>JINGLE</span><span>Auto</span></div>
-      <div class="program"><strong>19:01</strong><span>PROGRAMME2</span><span>Suivant</span></div>
-      <div class="program"><strong>20:00</strong><span>JINGLE</span><span>Auto</span></div>
-      <p class="muted">Cette grille est visuelle pour l’instant. La prochaine version la rendra réellement programmable.</p>
-    </section>
-  </div>
-</main>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>JD TV Playout</title>
+<style>:root{font-family:Inter,system-ui,sans-serif;color-scheme:dark}body{margin:0;background:#0b1020;color:#eef2ff}main{max-width:1200px;margin:auto;padding:28px 18px}h1{margin:0}.muted{color:#9aa4bf}.status{display:inline-flex;gap:8px;align-items:center;padding:8px 12px;border-radius:999px;background:#1a2344;margin:16px 0}.dot{width:10px;height:10px;border-radius:50%;background:#ef4444}.ok .dot{background:#22c55e}.grid{display:grid;grid-template-columns:.8fr 1.2fr;gap:18px}.card{background:#111831;border:1px solid #273152;border-radius:16px;padding:18px}button,input,select{border:1px solid #344064;border-radius:10px;padding:10px;background:#0b1020;color:white}button{cursor:pointer;font-weight:700;background:#4f46e5;border:0}.media{display:flex;justify-content:space-between;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid #222d4f}.row{display:grid;grid-template-columns:100px 1fr auto;gap:10px;margin:10px 0}.row input,.row select{width:100%;box-sizing:border-box}.danger{background:#7f1d1d}.onair{padding:12px;border-radius:12px;background:#090d1b;margin-bottom:14px}code{word-break:break-all}@media(max-width:800px){.grid{grid-template-columns:1fr}}</style></head>
+<body><main><h1>JD TV Playout</h1><div class="muted">Programmation locale 24/7 — CasparCG</div><div id="status" class="status"><span class="dot"></span>Vérification…</div>
+<div class="onair"><strong>À L’ANTENNE / moteur automatique</strong><div class="muted">La grille est exécutée par l’agent local même si cette page est fermée.</div></div>
+<div class="grid"><section class="card"><h2>Bibliothèque médias</h2><div id="dir" class="muted"></div><div id="media"></div></section>
+<section class="card"><h2>Grille du jour</h2><div class="muted">Ajoute une heure et un média. À l’heure exacte, l’agent lance le programme.</div><div id="schedule"></div><button onclick="addRow()">+ Ajouter un programme</button> <button onclick="save()">Enregistrer la grille</button><p id="msg" class="muted"></p></section></div></main>
 <script>
-async function cmd(command){
-  document.getElementById('log').textContent = 'Envoi: ' + command;
-  try {
-    const r = await fetch('/api/command', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({command})});
-    const data = await r.json();
-    document.getElementById('log').textContent = data.ok ? (data.response || 'Commande envoyée') : ('Erreur: ' + data.error);
-  } catch (e) {
-    document.getElementById('log').textContent = 'Erreur réseau: ' + e.message;
-  }
-}
-function sendCustom(){ cmd(document.getElementById('command').value); }
-async function check(){
-  const el = document.getElementById('status');
-  try {
-    const r = await fetch('/api/status');
-    const data = await r.json();
-    el.className = 'status ' + (data.ok ? 'ok' : 'bad');
-    el.innerHTML = '<span class="dot"></span><span>' + (data.ok ? 'CasparCG connecté' : 'CasparCG hors ligne') + '</span>';
-  } catch {
-    el.className = 'status bad';
-    el.innerHTML = '<span class="dot"></span><span>Agent local indisponible</span>';
-  }
-}
-check();
-setInterval(check, 5000);
-</script>
-</body>
-</html>
+let media=[], schedule=[];
+async function api(url,opt){const r=await fetch(url,opt);return r.json()}
+async function check(){const e=document.getElementById('status');try{const d=await api('/api/status');e.className='status '+(d.ok?'ok':'');e.innerHTML='<span class="dot"></span>'+(d.ok?'CasparCG connecté':'CasparCG hors ligne')}catch{e.innerHTML='<span class="dot"></span>Agent indisponible'}}
+async function load(){const m=await api('/api/media');media=m.media||[];document.getElementById('dir').innerHTML='Dossier surveillé : <code>'+m.mediaDir+'</code>';document.getElementById('media').innerHTML=media.length?media.map(x=>'<div class="media"><span>'+x.file+'</span><button onclick="play(\''+x.name.replace(/'/g,"\\'")+'\')">▶</button></div>').join(''):'<p>Aucun média détecté dans ce dossier.</p>';const s=await api('/api/schedule');schedule=s.schedule||[];render()}
+function render(){document.getElementById('schedule').innerHTML=schedule.map((r,i)=>'<div class="row"><input type="time" value="'+(r.time||'')+'" onchange="schedule['+i+'].time=this.value"><select onchange="schedule['+i+'].media=this.value"><option value="">Choisir…</option>'+media.map(m=>'<option '+(m.name===r.media?'selected':'')+' value="'+m.name+'">'+m.file+'</option>').join('')+'</select><button class="danger" onclick="schedule.splice('+i+',1);render()">×</button></div>').join('')}
+function addRow(){schedule.push({time:'',media:''});render()}
+async function save(){schedule.sort((a,b)=>a.time.localeCompare(b.time));const d=await api('/api/schedule',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({schedule})});document.getElementById('msg').textContent=d.ok?'Grille enregistrée ✓':d.error;render()}
+async function play(name){await api('/api/command',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({command:'PLAY 1-1 "'+name+'"'})})}
+check();load();setInterval(check,5000);
+</script></body></html>
