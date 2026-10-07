@@ -7,7 +7,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const CASPAR_HOST = process.env.CASPAR_HOST || '127.0.0.1';
 const CASPAR_PORT = Number(process.env.CASPAR_PORT || 5250);
-const MEDIA_DIR = process.env.CASPAR_MEDIA || path.join(__dirname, 'media');
+const MEDIA_DIR = process.env.CASPAR_MEDIA || 'C:\\CasparCG\\media';
 const SCHEDULE_FILE = path.join(__dirname, 'schedule.json');
 
 app.use(express.json());
